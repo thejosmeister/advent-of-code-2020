@@ -1,5 +1,7 @@
 # day1 part 1
 # loop through list, try to find number = 2020 - num
+# Not bothered about filtering out the case when there is a single 1010 entry in the list as I would have to
+# differentiate between there being more than 1 1010 entry which is too much effort.
 
 input_list = []
 
