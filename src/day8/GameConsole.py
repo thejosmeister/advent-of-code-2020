@@ -10,7 +10,6 @@ class GameConsole:
 
     # Process each instruction, will probably call out to other methods when it gets more complex
     def process_instruction(self, instruction: str):
-        print(instruction)
         action = instruction[:3]
 
         if action == 'nop':
