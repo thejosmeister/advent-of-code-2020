@@ -32,7 +32,8 @@ def check_repeat(new: list, old: list, width: int, height: int) -> bool:
     return True
 
 
-def main(map_of_seats: list, occupy_seat, map_of_seats_width: int, map_of_seats_height: int):
+# Main method that creates seat maps using the rules.
+def main(map_of_seats: list, occupy_seat, map_of_seats_width: int, map_of_seats_height: int) -> int:
     while True:
         # Make new map of seats using occupation rules.
         y = 0
