@@ -30,7 +30,8 @@ def is_seat_in_direction(_x, _y, x_increment: int, y_increment: int, _map_of_sea
 # Uses the criteria to occupy or vacate a seat.
 def occupy_seat(_x: int, _y: int, _map_of_seats: list) -> str:
     num_adj_occ = 0
-    # fix x
+
+    # Look in each direction for seats.
     num_adj_occ += is_seat_in_direction(_x, _y, 0, 1, _map_of_seats)
     num_adj_occ += is_seat_in_direction(_x, _y, 0, -1, _map_of_seats)
     num_adj_occ += is_seat_in_direction(_x, _y, 1, 0, _map_of_seats)
