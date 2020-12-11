@@ -32,14 +32,12 @@ def occupy_seat(_x: int, _y: int, _map_of_seats: list) -> str:
     num_adj_occ = 0
 
     # Look in each direction for seats.
-    num_adj_occ += is_seat_in_direction(_x, _y, 0, 1, _map_of_seats)
-    num_adj_occ += is_seat_in_direction(_x, _y, 0, -1, _map_of_seats)
-    num_adj_occ += is_seat_in_direction(_x, _y, 1, 0, _map_of_seats)
-    num_adj_occ += is_seat_in_direction(_x, _y, -1, 0, _map_of_seats)
-    num_adj_occ += is_seat_in_direction(_x, _y, 1, 1, _map_of_seats)
-    num_adj_occ += is_seat_in_direction(_x, _y, -1, 1, _map_of_seats)
-    num_adj_occ += is_seat_in_direction(_x, _y, 1, -1, _map_of_seats)
-    num_adj_occ += is_seat_in_direction(_x, _y, -1, -1, _map_of_seats)
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            if i == 0 and j == 0:
+                continue
+
+            num_adj_occ += is_seat_in_direction(_x, _y, i, j, _map_of_seats)
 
     if num_adj_occ > 4:
         return 'L'
