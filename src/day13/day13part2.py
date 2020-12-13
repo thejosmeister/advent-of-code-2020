@@ -58,7 +58,7 @@ def find_lowest_mult_of_coeff_that_satisfies_mod_condition(mod_conditon: int, co
         if a == mod_conditon:
             break
         bi += 1
-        # this line can just be 'coeff = j * original_coeff'
+        # this line can just be 'working_coeff = bi * original_coeff'
         working_coeff = (bi % service_no) * coeff_mod_y
 
     return coeff * bi
