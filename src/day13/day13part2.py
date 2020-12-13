@@ -45,38 +45,37 @@ for service in list_of_running_services:
         coeff_tot *= s
     list_of_coeffs.append(coeff_tot)
 
-print(list_of_coeffs)
 
-
-# I had to fettle this method a bit by taking mods throughout the calculation as if i simply kept multiplying the coefficient xi by
+# Finds a bi that satisfies the eqn at the top for the corresponding xi.
+# Returns bi*xi
+# I streamlined this method a bit by taking mods throughout the calculation so that the numbers were not as big
 def find_lowest_mult_of_coeff_that_satisfies_mod_condition(mod_conditon: int, coeff: int, service_no: int) -> int:
-    print('finding lowest mult of: ' + str(coeff) + ' s.t. it = ' + str(mod_conditon) + ' mod ' + str(service_no))
-    j = 1
+    bi = 1
     coeff_mod_y = coeff % service_no
-    original_coeff = coeff
+    working_coeff = coeff
     while True:
-        a = coeff % service_no
+        a = working_coeff % service_no
         if a == mod_conditon:
             break
-        j += 1
-        coeff = (j % service_no) * coeff_mod_y
+        bi += 1
+        # this line can just be 'coeff = j * original_coeff'
+        working_coeff = (bi % service_no) * coeff_mod_y
 
-    print('found')
-    print(original_coeff * j)
-    return original_coeff * j
+    return coeff * bi
 
 
-out = 0
-
+# This is the calculation that will give us the LHS of the top eqn
+ax_plus_time = 0
 for i in range(len(list_of_running_services)):
-    out += find_lowest_mult_of_coeff_that_satisfies_mod_condition(list_of_mods[i], list_of_coeffs[i], list_of_running_services[i])
+    # sum the bi*xi
+    ax_plus_time += find_lowest_mult_of_coeff_that_satisfies_mod_condition(list_of_mods[i], list_of_coeffs[i], list_of_running_services[i])
 
-print(' out = ' + str(out))
-
+# Calculate x from the top eqn
 x = 1
-divisor = 1
 for i in range(len(list_of_running_services)):
-    divisor *= list_of_running_services[i]
+    x *= list_of_running_services[i]
 
 
-print(divisor-(out % divisor))
+# a*x + time = ax_plus_time = RHS of top eqn
+# time = ax_plus_time - a*x = x - (ax_plus_time mod x)
+print('1st time were services arrive sequentially: ' + str(x - (ax_plus_time % x)))
