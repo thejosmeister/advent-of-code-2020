@@ -3,12 +3,12 @@ Day 13 Part 2
 
 This part is basically chinese remainder theorem.
 
-All service numbers are prime and thus coprime so we can apply CRT.
+All service numbers are prime and thus co-prime so we can apply CRT.
 
 To preform this I will have an eqn in the form
 
 a*x + time = b0*x0 + ... + bn*xn where:
-a, b0,...,bn >0 , x = all service numbers mult toegther, xi = x/ith service no.,
+a, b0,...,bn >0 , x = all service numbers multiplied together, xi = x/ith service no.,
 time = the time of arrival of the first bus where we then get the sequential arrivals
 
 We will be able to find 'a*x + time' by computing the RHS using the fact that 'xi mod service no.[j] = 0 for all i != j'
@@ -38,10 +38,10 @@ for i in range(len(list_of_services)):
 # Now we want to find our initial coefficients for the CRT eqn (the xi stated at the top)
 list_of_coeffs = []
 for service in list_of_running_services:
-    l = list_of_running_services.copy()
-    l.remove(service)
+    temp_list = list_of_running_services.copy()
+    temp_list.remove(service)
     coeff_tot = 1
-    for s in l:
+    for s in temp_list:
         coeff_tot *= s
     list_of_coeffs.append(coeff_tot)
 
