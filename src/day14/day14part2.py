@@ -43,6 +43,7 @@ def apply_address_decoder(inp: str) -> list:
             out += char
         i += 1
 
+    # Then want permutations of decoded address.
     return change_1st_x(out)
 
 
