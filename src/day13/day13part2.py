@@ -24,7 +24,7 @@ f.close()
 
 # Only care about service numbers this time
 list_of_services = file_contents[1].split(',')
-# Each service number x minutes past the time for the 1st service so will be 'time = x mod service no.'
+# Each service number x minutes past the time for the 1st service so will be 'time = (service no. - x) mod service no.'
 # We have to take into account x > service number by using the fact that the service will just arrive n times before
 # our x so 'x = n * service no. + y' with y < service no.
 list_of_running_services = []
@@ -33,7 +33,7 @@ for i in range(len(list_of_services)):
     if list_of_services[i].isnumeric():
         list_of_running_services.append(int(list_of_services[i]))
         # find y from above ( y = x for service no. > x )
-        list_of_mods.append(i % int(list_of_services[i]))
+        list_of_mods.append((int(list_of_services[i]) - i) % int(list_of_services[i]))
 
 # Now we want to find our initial coefficients for the CRT eqn (the xi stated at the top)
 list_of_coeffs = []
@@ -77,5 +77,5 @@ for i in range(len(list_of_running_services)):
 
 
 # a*x + time = ax_plus_time = RHS of top eqn
-# time = ax_plus_time - a*x = x - (ax_plus_time mod x)
-print('1st time were services arrive sequentially: ' + str(x - (ax_plus_time % x)))
+# time = ax_plus_time - a*x = (ax_plus_time mod x)
+print('1st time were services arrive sequentially: ' + str(ax_plus_time % x))
