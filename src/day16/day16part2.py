@@ -1,88 +1,31 @@
+"""
+Day 16 Part 2
 
-rules = {}
-my_ticket = []
-other_tickets = []
+Was held up by the fact that I was modifying an array I was iterating through, oops.
+"""
+from day16.day16common import set_up, check_validity_of_ticket
 
-state = 0
+set_up_values = set_up()
 
-
-def format_as_rule(line: str) -> list:
-    valid_nums = []
-    for i in range(int(line.split(': ')[1].split('-')[0]), int(line.split(': ')[1].split(' or ')[0].split('-')[1]) + 1):
-        valid_nums.append(i)
-    for i in range(int(line.split(' or ')[1].split('-')[0]), int(line.split(' or ')[1].split('-')[1]) + 1):
-        valid_nums.append(i)
-
-    return valid_nums
-
-
-f = open("day16input.txt", "r")
-for file_line in f:
-    if file_line == '\n':
-        continue
-    if file_line.rstrip() == 'your ticket:':
-        state = 1
-        continue
-    if file_line.rstrip() == 'nearby tickets:':
-        state = 2
-        continue
-    if state == 0:
-        rules[file_line.split(':')[0]] = format_as_rule(file_line.rstrip())
-    if state == 1:
-        my_ticket = [int(i) for i in file_line.rstrip().split(',')]
-    if state == 2:
-        other_tickets.append([int(i) for i in file_line.rstrip().split(',')])
-f.close()
-
-rule_names = rules.keys()
-
-
-# def check_validity_of_ticket(_ticket: list) -> bool:
-#     _rules = list(rule_names)
-#
-#     for value in ticket:
-#         rules_satisfied = []
-#         for rul in _rules:
-#             if value in rules[rul]:
-#                 rules_satisfied.append(rul)
-#
-#         if len(rules_satisfied) == 0:
-#             print(str(value) + ': ' + str(ticket.index(value)))
-#             return False
-#
-#     return True
-
-# Returns the amount of error in the ticket (the values that don't adhere to any rules)
-def check_validity_of_ticket(_ticket: list) -> int:
-    out = 0
-    _rules = list(rule_names)
-    for value in ticket:
-        rules_satisfied = []
-        for rule in _rules:
-            if value in rules[rule]:
-                rules_satisfied.append(rule)
-
-        if len(rules_satisfied) == 0:
-            out += value
-            continue
-    return out
-
+rules = set_up_values[0]
+my_ticket = set_up_values[3]
+other_tickets = set_up_values[2]
 
 
 # remove non valid tickets
 tickets_to_remove = []
 for ticket in other_tickets:
-    if not check_validity_of_ticket(ticket):
+    if check_validity_of_ticket(ticket, rules) > 0:
         tickets_to_remove.append(ticket)
-
 
 for t in tickets_to_remove:
     other_tickets.remove(t)
 
 
+# Look through list of tickets and add rows where, for all tickets, the row adheres to the rule.
 rules_with_rows = {}
 
-for rule in rule_names:
+for rule in rules.keys():
     rows = []
     for row in range(20):
         total_sat = 0
@@ -93,19 +36,27 @@ for rule in rule_names:
             rows.append(row)
     rules_with_rows[rule] = rows
 
+# Now we want to reduce the map rules_with_rows by taking out the rows that can be assigned to a rule
+# i.e. where a rule only has 1 viable row
+# We can then remove this row from any other lists of rows for rules. This will (hopefully) mean another rule will only
+# have one row now.
+# Eventually, we should be able to deduct the row for all the rules.
+
+# The map that we will populate with the row for each rule.
 map_of_rules = {}
 
 
-def remove_value_from_others(val: int, rwr:dict ) -> dict:
+# Removes a rule name key from rules_with_rows
+def remove_value_from_others(val: int, rwr: dict) -> dict:
     for r in rwr.keys():
         if val in rwr[r]:
             rwr[r].remove(val)
     return rwr
 
 
+# Looks for rules with only one row number then takes the row number(s) away from the other row lists.
 def deduct(rwr: dict) -> dict:
     global map_of_rules
-    print(rwr)
     vals_to_remove = []
     list_of_rules = list(rwr.keys())
     for _rule in list_of_rules:
@@ -119,11 +70,14 @@ def deduct(rwr: dict) -> dict:
     return rwr
 
 
+# Apply the above till we have a complete map.
 while len(map_of_rules.keys()) < 20:
     rules_with_rows = deduct(rules_with_rows.copy())
 
-print(map_of_rules)
+# Filter out the row numbers for row names with departure in.
+indices = [map_of_rules[name] for name in list(filter(lambda x: ('departure' in x), list(map_of_rules.keys())))]
 
-print(my_ticket[1] * my_ticket[8] * my_ticket[19] * my_ticket[10] * my_ticket[3] * my_ticket[6] )
-
-
+mult_together = 1
+for index in indices:
+    mult_together *= my_ticket[index]
+print('Answer: ' + str(mult_together))
