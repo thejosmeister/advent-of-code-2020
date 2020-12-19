@@ -2,7 +2,7 @@
 list_of_sums = []
 
 # Create a list of lists to become an array of seats.
-f = open("test.txt", "r")
+f = open("day18input.txt", "r")
 for file_line in f:
     list_of_sums.append(file_line.rstrip().replace(" ",""))
 f.close()
@@ -21,28 +21,25 @@ def find_trailing_bracket(calc: str) -> int:
 
 
 
-
-
-
-def reduce(calc: str, top_level: bool) -> str:
+def reduce(calc: str) -> str:
+    print('reducing ' + calc)
     if calc.find('(') == -1:
-        if top_level:
-            return calc
-        return str(evaluate_calc(calc))
+        return calc
+
 
     index_of_1st_close = calc.rfind(')')
     index_of_open = find_trailing_bracket(calc[:index_of_1st_close])
 
     if index_of_open == 0 and index_of_1st_close == len(calc) - 1:
-        return reduce(calc[index_of_open + 1:-1], False)
+        return str(evaluate_calc(reduce(calc[index_of_open + 1:-1])))
 
     if index_of_open == 0 and index_of_1st_close != len(calc) - 1:
-        return reduce(calc[index_of_open + 1: index_of_1st_close], False) + calc[index_of_1st_close + 1:]
+        return str(evaluate_calc(reduce(calc[index_of_open + 1: index_of_1st_close]))) + calc[index_of_1st_close + 1:]
 
     if index_of_1st_close == len(calc) - 1:
-        return reduce(calc[:index_of_open - 1], True) + calc[index_of_open - 1] + reduce(calc[index_of_open + 1:-1], False)
+        return reduce(calc[:index_of_open - 1]) + calc[index_of_open - 1] + str(evaluate_calc(reduce(calc[index_of_open + 1:-1])))
 
-    return reduce(calc[:index_of_open - 1], True) + calc[index_of_open - 1] + reduce(calc[index_of_open + 1:index_of_1st_close], False) + calc[index_of_1st_close + 1:]
+    return reduce(calc[:index_of_open - 1]) + calc[index_of_open - 1] + str(evaluate_calc(reduce(calc[index_of_open + 1:index_of_1st_close]))) + calc[index_of_1st_close + 1:]
 
 
 def evaluate_calc(calc: str) -> int:
@@ -55,7 +52,7 @@ def evaluate_calc(calc: str) -> int:
 
 
 def evaluate_line(line: str) -> int:
-    reduced_line = reduce(line, True)
+    reduced_line = reduce(line)
     print('reduced' + str(reduced_line))
     return evaluate_calc(reduced_line)
 
