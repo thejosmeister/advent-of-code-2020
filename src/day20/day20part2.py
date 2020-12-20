@@ -16,7 +16,7 @@ class Tile:
         self.internal_sides = internal_sides
 
     def generate_sides(self):
-        self.sides = {'top': self.tile[0], 'bottom': self.tile[9], 'left': ''.join([self.tile[i][0] for i in range(9, -1, -1)]),
+        self.sides = {'top': self.tile[0], 'bottom': self.tile[9], 'left': ''.join([self.tile[i][0] for i in range(0, 10)]),
          'right': ''.join([self.tile[i][9] for i in range(0, 10)])}
 
     def rotate_edge_and_internal(self, side_name: str, right: bool) -> str:
@@ -182,10 +182,13 @@ def find_edge_tile_to_match(tile_side: str, edge_side_must_be: str, match_on: st
         next_tile.rotate_90_clockwise()
 
     if not match_side(tile_side, next_tile.sides[match_on]):
-        next_tile.reflect_vertical()
+        if edge_side_must_be in ['left', 'right']:
+            next_tile.reflect_horizontal()
+        else:
+            next_tile.reflect_vertical()
 
     if not match_side(next_tile.sides[match_on], tile_side):
-        print('left not matching ' + tile_side + ' tile:')
+        print(match_on + ' not matching ' + tile_side + ' tile:')
         next_tile.to_string()
 
     return next_tile
@@ -212,6 +215,10 @@ def find_corner_tile_to_match(tile_side: str, edge_sides_must_be: list, side_to_
             next_tile.reflect_horizontal()
         else:
             next_tile.reflect_vertical()
+
+    if not strict_match_side(next_tile.sides[side_to_match], tile_side):
+        print(side_to_match + ' not matching ' + tile_side + ' tile:')
+        next_tile.to_string()
 
     return next_tile
 
@@ -243,7 +250,7 @@ def find_internal_tile_to_match(left_tile_side: str, top_tile_side: str) -> Tile
     if not strict_match_side(next_tile.sides['top'], top_tile_side):
         print('Top not matching ' + top_tile_side + ' tile:')
         next_tile.to_string()
-    if not strict_match_side(next_tile.sides['left'], left_tile_side[::-1]):
+    if not strict_match_side(next_tile.sides['left'], left_tile_side):
         print('left not matching ' + left_tile_side + ' tile:')
         next_tile.to_string()
 
@@ -297,7 +304,7 @@ image[dimension_of_image - 1].append(find_corner_tile_to_match(image[dimension_o
 print('found ' + str(dimension_of_image - 1) + str(dimension_of_image - 1) + ' tile id: ' + str(image[dimension_of_image - 1][dimension_of_image - 1].id))
 
 
-# create picture then strip borders
+
 
 for i in range(dimension_of_image):
     for j in range(dimension_of_image):
@@ -321,47 +328,36 @@ newpic = []
 
 for i in range(10 * dimension_of_image):
     if i % 10 not in [0, 9]:
-        newpic.append(''.join( picture[i][j] for j in list(filter(lambda x: (x % 10 not in [0, 9]), range(10 * dimension_of_image)))))
+        newpic.append(''.join(picture[i][j] for j in list(filter(lambda x: (x % 10 not in [0, 9]), range(10 * dimension_of_image)))))
 
 [print(l) for l in newpic]
 
 print('finding sea monsters')
 
 sea_monster_regex_line_1 = '^.{18}(#|O).$'
-sea_monster_regex_line_2 = '^(#|O).{4}(#|O){2}.{4}(#|O){2}.{4}(#|O){3}$'
+sea_monster_regex_line_2 = '^[^\.].{4}(#|O){2}.{4}(#|O){2}.{4}(#|O){3}$'
 sea_monster_regex_line_3 = '^.(#|O).{2}(#|O).{2}(#|O).{2}(#|O).{2}(#|O).{2}(#|O).{3}$'
 
+number_of_sea_monsters = 0
 
 def search_image_for_sea_monsters(_image: list) -> list:
-    for i in range(len(_image) - 3):
-        # print(i)
-        for j in range(len(_image) - 20):
-            # print(j)
-            if re.search(sea_monster_regex_line_1, _image[i][j:j + 20]) is not None:
+    global number_of_sea_monsters
+    for i in range(len(_image) - 1):
+        # print('i = ' + str(i))
+        for g in range(len(_image)):
+            # print('j = ' + str(g))
+            if re.search(sea_monster_regex_line_1, _image[i][g:g + 20]) is not None:
                 # print('passed line 1 regex')
-                if (re.search(sea_monster_regex_line_2, _image[i + 1][j:j + 20]) is not None) and (re.search(sea_monster_regex_line_3, _image[i + 2][j:j + 20]) is not None):
-                    print('found sea monster: ' + str(i) + str(j))
-                    _image[i] = ''.join([_image[i][:j + 18], 'O', _image[i][j + 19:]])
-                    _image[i + 1] = ''.join([_image[i + 1][:j], 'O', _image[i + 1][j + 1:j + 5], 'OO', _image[i + 1][j + 7:j + 11], 'OO', _image[i + 1][j + 13:j + 17], 'OOO', _image[i + 1][j + 20:]])
-                    _image[i + 2] = ''.join([_image[i + 2][:j+1], 'O', _image[i + 2][j + 2:j + 4], 'O', _image[i + 2][j + 5:j + 7], 'O', _image[i + 2][j + 8:j + 10], 'O', _image[i + 2][j + 11:j + 13], 'O', _image[i + 2][j + 14:j + 16], 'O', _image[i + 2][j + 17:]])
+                if (re.search(sea_monster_regex_line_2, _image[i + 1][g:g + 20]) is not None) and (re.search(sea_monster_regex_line_3, _image[i + 2][g:g + 20]) is not None):
+                    print('found sea monster: ' + str(i) + str(g))
+                    number_of_sea_monsters += 1
+                    _image[i] = ''.join([_image[i][:g + 18], 'O', _image[i][g + 19:]])
+                    _image[i + 1] = ''.join([_image[i + 1][:g], 'O', _image[i + 1][g + 1:g + 5], 'OO', _image[i + 1][g + 7:g + 11], 'OO', _image[i + 1][g + 13:g + 17], 'OOO', _image[i + 1][g + 20:]])
+                    _image[i + 2] = ''.join([_image[i + 2][:g+1], 'O', _image[i + 2][g + 2:g + 4], 'O', _image[i + 2][g + 5:g + 7], 'O', _image[i + 2][g + 8:g + 10], 'O', _image[i + 2][g + 11:g + 13], 'O', _image[i + 2][g + 14:g + 16], 'O', _image[i + 2][g + 17:]])
 
     return _image
 
 the_image = newpic.copy()
-for i in range(4):
-    the_image = search_image_for_sea_monsters(the_image.copy())
-    [print(l) for l in the_image]
-    # reflect vertically
-    the_image = [line[::-1] for line in the_image]
-    the_image = search_image_for_sea_monsters(the_image.copy())
-    # reflect back
-    the_image = [line[::-1] for line in the_image]
-
-    # turn 90 clock
-    the_image = [''.join([the_image[k][j] for k in range(len(the_image) - 1, -1, -1)]) for j in range(len(the_image))]
-    print('\n')
-    [print(l) for l in the_image]
-    print('\n')
 
 number_of_hash = 0
 
@@ -369,9 +365,57 @@ for line in the_image:
     number_of_hash += line.count('#')
 
 print('\n')
+print('# hash before ' + str(number_of_hash))
+
+for i in range(3):
+    if i == 2:
+        the_image = search_image_for_sea_monsters(the_image)
+
+        # reflect vertically
+        the_image = [line[::-1] for line in the_image]
+        the_image = search_image_for_sea_monsters(the_image)
+
+        # reflect back
+        the_image = [line[::-1] for line in the_image]
+
+        the_image.reverse()
+        the_image = search_image_for_sea_monsters(the_image)
+        the_image.reverse()
+        [print(l) for l in the_image]
+        print('\n')
+        # [print(l) for l in the_image]
+        print('\n')
+    else:
+        # turn 90 clock
+        the_image = [''.join([the_image[k][j] for k in range(len(the_image) - 1, -1, -1)]) for j in range(len(the_image))]
+
+
+number_of_hash = 0
+
+for line in the_image:
+    number_of_hash += line.count('#')
+
+number_of_hash2 = 0
+
+for line in newpic:
+    number_of_hash2 += line.count('#')
+
+print('\n')
 
 
 print(number_of_hash)
+print(number_of_hash2)
+print(number_of_sea_monsters * 15)
+
+newpic = [''.join([newpic[k][j] for k in range(len(newpic) - 1, -1, -1)]) for j in range(len(newpic))]
+newpic = [''.join([newpic[k][j] for k in range(len(newpic) - 1, -1, -1)]) for j in range(len(newpic))]
+
+
+[print(l) for l in newpic]
+# 2176 too high
+
+
+
 
 # comparison = []
 # f = open("image.txt", "r")
