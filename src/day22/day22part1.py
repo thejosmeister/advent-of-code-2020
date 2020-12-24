@@ -1,22 +1,11 @@
-player_1_cards = []
-player_2_cards = []
+"""
+Day 22 Part 1
 
-p = 1
+A fun game
+"""
+from day22.day22common import set_up
 
-f = open("day22input.txt", "r")
-for file_line in f:
-    if 'Player 1' in file_line:
-        continue
-    if 'Player 2' in file_line:
-        p = 2
-        continue
-    if file_line == '\n':
-        continue
-    if p == 1:
-        player_1_cards.append(int(file_line.rstrip()))
-    if p == 2:
-        player_2_cards.append(int(file_line.rstrip()))
-f.close()
+[player_1_cards, player_2_cards] = set_up()
 
 
 def play_round(p1_card: int, p2_card: int):
@@ -29,9 +18,12 @@ def play_round(p1_card: int, p2_card: int):
         player_2_cards.append(p1_card)
 
 
+# Play a game
 while len(player_1_cards) > 0 and len(player_2_cards) > 0:
     play_round(player_1_cards.pop(0), player_2_cards.pop(0))
 
+
+# Work out winning score
 out = 0
 mult = 1
 if len(player_1_cards) > 0:
@@ -43,4 +35,4 @@ else:
         out += card * mult
         mult += 1
 
-print(out)
+print('Winning score: ' + str(out))
