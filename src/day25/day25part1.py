@@ -26,7 +26,7 @@ for number in numbers:
             break
         num = calc
         i += 1
-    print(str(number) + ' is equal to' + str(subject_number) + ' to the power of: ' + str(i))
+    print(str(number) + ' is equal to ' + str(subject_number) + ' to the power of: ' + str(i))
     the_powers.append(i)
 
 a_b = the_powers[0] * the_powers[1]
