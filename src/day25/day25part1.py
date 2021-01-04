@@ -3,6 +3,8 @@ Day 25 Part 1
 
 Pretty quick and dirty brute force of Diffie-Hellman
 """
+import datetime
+print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 numbers = []
 subject_number = 7
@@ -17,12 +19,16 @@ the_powers = []
 
 for number in numbers:
     i = 2
+    num = 7
     while True:
-        if pow(subject_number, i, base) == number:
+        calc = (num * subject_number) % base
+        if calc == number:
             break
+        num = calc
         i += 1
     print(str(number) + ' is equal to' + str(subject_number) + ' to the power of: ' + str(i))
     the_powers.append(i)
 
 a_b = the_powers[0] * the_powers[1]
 print('The common secret key is: ' + str(pow(subject_number, a_b, base)))
+print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
