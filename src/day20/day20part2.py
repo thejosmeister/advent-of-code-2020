@@ -95,7 +95,6 @@ f.close()
 
 def match_side(main_side: str, other_side: str) -> bool:
     result = main_side == other_side or main_side == other_side[::-1]
-    # print('main: ' + main_side + ' other: ' + other_side + ' result: ' + str(result))
     return result
 
 
@@ -104,18 +103,13 @@ def strict_match_side(main_side: str, other_side: str) -> bool:
 
 
 def check_if_side_matches_any_others(_side: str, id_containing_side: str) -> bool:
-    # print('checking if side: ' + _side + ' from ' + id_containing_side + ' tile matches any others')
     for _id in tiles.keys():
         if _id == id_containing_side:
             continue
         for side_id in tiles[_id].sides.keys():
             if match_side(_side, tiles[_id].sides[side_id]):
-                # print('it does')
                 return True
-    # print('it doesnt')
     return False
-
-# print(tiles)
 
 
 corner_tiles = []
@@ -137,10 +131,6 @@ for _id in tiles.keys():
         print(_id + ' should not happen')
 
 middle_tiles = list(filter(lambda x: (x not in corner_tiles and x not in side_border_tiles), tiles.keys()))
-# print(len(middle_tiles))
-# print(len(corner_tiles))
-# print(len(side_border_tiles))
-# print(len(tiles.keys()))
 
 # Build image by starting with a corner
 image = []
@@ -155,32 +145,25 @@ while 'top' not in top_corner.edge_sides:
 if 'left' not in top_corner.edge_sides:
     top_corner.reflect_vertical()
 
-print('\n\n\n')
-top_corner.to_string()
-print('\n\n\n')
-
 image[0].append(top_corner)
 corner_tiles.remove(top_corner.id)
 
+
 def find_edge_tile_to_match(tile_side: str, edge_side_must_be: str, match_on: str) -> Tile:
     global side_border_tiles
-    print('edge ' + str(side_border_tiles))
     id_of_edge = ''
     for _id in side_border_tiles:
         for s in tiles[_id].sides.keys():
             if match_side(tile_side, tiles[_id].sides[s]):
                 id_of_edge = _id
 
-    print('removing ' + id_of_edge)
-    if id_of_edge == '':
-        print(tile_side)
     side_border_tiles.remove(id_of_edge)
     next_tile = tiles[id_of_edge]
 
     while edge_side_must_be not in next_tile.edge_sides:
         next_tile.rotate_90_clockwise()
 
-    if not match_side(tile_side, next_tile.sides[match_on]):
+    if not strict_match_side(tile_side, next_tile.sides[match_on]):
         if edge_side_must_be in ['left', 'right']:
             next_tile.reflect_horizontal()
         else:
@@ -195,7 +178,6 @@ def find_edge_tile_to_match(tile_side: str, edge_side_must_be: str, match_on: st
 
 def find_corner_tile_to_match(tile_side: str, edge_sides_must_be: list, side_to_match: str) -> Tile:
     global corner_tiles
-    print('corner ' + str(corner_tiles))
     id_of_edge = ''
     for _id in corner_tiles:
         for s in tiles[_id].sides.keys():
@@ -224,7 +206,6 @@ def find_corner_tile_to_match(tile_side: str, edge_sides_must_be: list, side_to_
 
 def find_internal_tile_to_match(left_tile_side: str, top_tile_side: str) -> Tile:
     global middle_tiles
-    print('middle ' + str(middle_tiles))
     id_of_tile = ''
     for _id in middle_tiles:
         matches = 0
@@ -257,57 +238,27 @@ def find_internal_tile_to_match(left_tile_side: str, top_tile_side: str) -> Tile
 
 
 for i in range(1, dimension_of_image - 1):
-
     image[0].append(find_edge_tile_to_match(image[0][i - 1].sides['right'], 'top', 'left'))
-    print('found ' + str(0) + str(i) + ' tile id: ' + str(image[0][i].id))
-
-
-
-
-# image[0][dimension_of_image - 2].to_string()
-# for z in corner_tiles:
-#     tiles[z].to_string()
-
 
 image[0].append(find_corner_tile_to_match(image[0][dimension_of_image - 2].sides['right'], ['top', 'right'], 'left'))
-print('found ' + str(0) + str(dimension_of_image - 1) + ' tile id: ' + str(image[0][dimension_of_image - 1].id))
 
 # Top line done so now do next 10 lines the same
 for i in range(1, dimension_of_image - 1):
     # match edge
-
     image[i].append(find_edge_tile_to_match(image[i - 1][0].sides['bottom'], 'left', 'top'))
-    print('found ' + str(i) + str(0) + ' tile id: ' + str(image[i][0].id))
     # match middle
     for j in range(1, dimension_of_image - 1):
-
         image[i].append(find_internal_tile_to_match(image[i][j - 1].sides['right'], image[i - 1][j].sides['bottom']))
-        print('found ' + str(i) + str(j) + ' tile id: ' + str(image[i][j].id))
     # match edge
-
     image[i].append(find_edge_tile_to_match(image[i][dimension_of_image - 2].sides['right'], 'right', 'left'))
-    print('found ' + str(i) + str(dimension_of_image - 1) + ' tile id: ' + str(image[i][dimension_of_image - 1].id))
 
 # Do bottom row
-
 image[dimension_of_image - 1].append(find_corner_tile_to_match(image[dimension_of_image - 2][0].sides['bottom'], ['left', 'bottom'], 'top'))
-print('found ' + str(dimension_of_image - 1) + str(0) + ' tile id: ' + str(image[dimension_of_image - 1][0].id))
 
 for i in range(1, dimension_of_image - 1):
-
     image[dimension_of_image - 1].append(find_edge_tile_to_match(image[dimension_of_image - 1][i - 1].sides['right'], 'bottom', 'left'))
-    print('found ' + str(dimension_of_image - 1) + str(i) + ' tile id: ' + str(image[dimension_of_image - 1][i].id))
-
 
 image[dimension_of_image - 1].append(find_corner_tile_to_match(image[dimension_of_image - 1][dimension_of_image - 2].sides['right'], ['right', 'bottom'], 'left'))
-print('found ' + str(dimension_of_image - 1) + str(dimension_of_image - 1) + ' tile id: ' + str(image[dimension_of_image - 1][dimension_of_image - 1].id))
-
-
-
-
-for i in range(dimension_of_image):
-    for j in range(dimension_of_image):
-        print(str(i) + str(j) + ' ' + str(image[i][j].id))
 
 
 
@@ -321,20 +272,17 @@ for i in range(dimension_of_image):
             line_of_picture += image[i][k].tile[j]
         picture.append(line_of_picture)
 
-[print(l) for l in picture]
-
 newpic = []
 
 for i in range(10 * dimension_of_image):
     if i % 10 not in [0, 9]:
         newpic.append(''.join(picture[i][j] for j in list(filter(lambda x: (x % 10 not in [0, 9]), range(10 * dimension_of_image)))))
 
-[print(l) for l in newpic]
 
-print('finding sea monsters')
+print('\nFinding sea monsters\n')
 
 sea_monster_regex_line_1 = '^.{18}(#|O).$'
-sea_monster_regex_line_2 = '^[^\.].{4}(#|O){2}.{4}(#|O){2}.{4}(#|O){3}$'
+sea_monster_regex_line_2 = '^(#|O).{4}(#|O){2}.{4}(#|O){2}.{4}(#|O){3}$'
 sea_monster_regex_line_3 = '^.(#|O).{2}(#|O).{2}(#|O).{2}(#|O).{2}(#|O).{2}(#|O).{3}$'
 
 number_of_sea_monsters = 0
@@ -344,9 +292,7 @@ def search_image_for_sea_monsters(_image: list) -> list:
     for i in range(len(_image) - 2):
         for g in range(len(_image) - 19):
             if re.search(sea_monster_regex_line_1, _image[i][g:g + 20]) is not None:
-                # print('passed line 1 regex')
                 if (re.search(sea_monster_regex_line_2, _image[i + 1][g:g + 20]) is not None) and (re.search(sea_monster_regex_line_3, _image[i + 2][g:g + 20]) is not None):
-                    print('found sea monster: ' + str(i) + str(g))
                     number_of_sea_monsters += 1
                     _image[i] = ''.join([_image[i][:g + 18], 'O', _image[i][g + 19:]])
                     _image[i + 1] = ''.join([_image[i + 1][:g], 'O', _image[i + 1][g + 1:g + 5], 'OO', _image[i + 1][g + 7:g + 11], 'OO', _image[i + 1][g + 13:g + 17], 'OOO', _image[i + 1][g + 20:]])
@@ -361,79 +307,26 @@ number_of_hash = 0
 for line in the_image:
     number_of_hash += line.count('#')
 
-print('\n')
-print('# hash before ' + str(number_of_hash))
 
 for i in range(3):
-    if i == 2:
-        the_image = search_image_for_sea_monsters(the_image)
-
-        # reflect vertically
-        the_image = [line[::-1] for line in the_image]
-        the_image = search_image_for_sea_monsters(the_image)
-
-        # reflect back
-        the_image = [line[::-1] for line in the_image]
-
-        the_image.reverse()
-        the_image = search_image_for_sea_monsters(the_image)
-        the_image.reverse()
+    the_image = search_image_for_sea_monsters(the_image)
+    if number_of_sea_monsters > 0:
         [print(l) for l in the_image]
-        print('\n')
-        # [print(l) for l in the_image]
-        print('\n')
-    else:
-        # turn 90 clock
-        the_image = [''.join([the_image[k][j] for k in range(len(the_image) - 1, -1, -1)]) for j in range(len(the_image))]
+        break
 
+    # turn 90 clock
+    the_image = [''.join([the_image[k][j] for k in range(len(the_image) - 1, -1, -1)]) for j in range(len(the_image))]
+
+
+original_number_of_hash = 0
+
+for line in newpic:
+    original_number_of_hash += line.count('#')
 
 number_of_hash = 0
 
 for line in the_image:
     number_of_hash += line.count('#')
 
-number_of_hash2 = 0
-
-for line in newpic:
-    number_of_hash2 += line.count('#')
-
-print('\n')
-
-
-print(number_of_hash)
-print(number_of_hash2)
-print(number_of_sea_monsters * 15)
-
-newpic = [''.join([newpic[k][j] for k in range(len(newpic) - 1, -1, -1)]) for j in range(len(newpic))]
-newpic = [''.join([newpic[k][j] for k in range(len(newpic) - 1, -1, -1)]) for j in range(len(newpic))]
-
-
-[print(l) for l in newpic]
-# 2176 too high
-
-
-
-
-# comparison = []
-# f = open("image.txt", "r")
-# for file_line in f:
-#     comparison.append(file_line.rstrip())
-# f.close()
-#
-# number_of_hash2 = 0
-#
-# for line in comparison:
-#     number_of_hash2 += line.count('#')
-# print('\n')
-#
-# print(number_of_hash2)
-#
-# for i in range(24):
-#     if comparison[i] != the_image[i]:
-#         print(comparison[i])
-#         print(the_image[i])
-#         print(i)
-#
-# print('\n')
-# [print(l) for l in comparison]
-# print('\n')
+print('\nNumber of hashes left: ' + str(number_of_hash))
+print('Number of sea monsters: ' + str(number_of_sea_monsters))

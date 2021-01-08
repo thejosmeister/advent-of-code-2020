@@ -26,24 +26,17 @@ for _id in tiles.keys():
 
 def match_side(main_side: str, other_side: str) -> bool:
     result = main_side == other_side or main_side == other_side[::-1]
-    print('main: ' + main_side + ' other: ' + other_side + ' result: ' + str(result))
     return result
 
 
 def check_if_side_matches_any_others(_side: str, id_containing_side: str) -> bool:
-    print('checking if side: ' + _side + ' from ' +  id_containing_side + ' tile matches any others')
     for _id in tiles.keys():
         if _id == id_containing_side:
             continue
         for side_id in tiles[_id]['sides'].keys():
             if match_side(_side, tiles[_id]['sides'][side_id]):
-                print('it does')
                 return True
-    print('it doesnt')
     return False
-
-print(tiles)
-
 
 corner_tiles = []
 side_border_tiles = []
@@ -60,10 +53,10 @@ for _id in tiles.keys():
     if num_of_outer > 2:
         print(_id + ' should not happen')
 
-print(corner_tiles)
+print('Corner tiles: ' + str(corner_tiles))
 
 out = 1
 for corner in corner_tiles:
     out *= int(corner)
 
-print(out)
+print('Product of corner tiles: ' + str(out))
