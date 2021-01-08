@@ -45,7 +45,6 @@ class Tile:
         self.edge_sides = [ self.rotate_edge_and_internal(s, True) for s in self.edge_sides]
         self.internal_sides = [self.rotate_edge_and_internal(s, True) for s in self.internal_sides]
 
-
     def rotate_90_anticlock(self):
         new_tile = [''.join([self.tile[i][j] for i in range(10)]) for j in range(9, -1, -1)]
         self.tile = new_tile
@@ -342,10 +341,8 @@ number_of_sea_monsters = 0
 
 def search_image_for_sea_monsters(_image: list) -> list:
     global number_of_sea_monsters
-    for i in range(len(_image) - 1):
-        # print('i = ' + str(i))
-        for g in range(len(_image)):
-            # print('j = ' + str(g))
+    for i in range(len(_image) - 2):
+        for g in range(len(_image) - 19):
             if re.search(sea_monster_regex_line_1, _image[i][g:g + 20]) is not None:
                 # print('passed line 1 regex')
                 if (re.search(sea_monster_regex_line_2, _image[i + 1][g:g + 20]) is not None) and (re.search(sea_monster_regex_line_3, _image[i + 2][g:g + 20]) is not None):
