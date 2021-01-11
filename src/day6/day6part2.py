@@ -1,4 +1,4 @@
-# Day 6 part 1
+# Day 6 part 2
 
 
 # Does what it says on the tin.
