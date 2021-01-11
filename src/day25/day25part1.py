@@ -2,7 +2,10 @@
 Day 25 Part 1
 
 Pretty quick and dirty brute force of Diffie-Hellman
+Just count up powers of the subject number modulo the base till we get both of the input numbers.
+Answer is then subject number to the power of the multiple of the two powers (modulo base).
 """
+# Timing my efforts.
 import datetime
 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
@@ -31,4 +34,5 @@ for number in numbers:
 
 a_b = the_powers[0] * the_powers[1]
 print('The common secret key is: ' + str(pow(subject_number, a_b, base)))
+
 print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
