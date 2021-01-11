@@ -33,7 +33,7 @@ Personal stats
 
 
 Completion times in more detail:
-|Day  | time to complete | pt1 complete | pt2 completed | 
+|Day  | time to complete pt2 once pt1 done | pt1 complete | pt2 completed | 
  | --- | --- | --- | --- | 
 | 1 | 0:20:50 | 2020-12-01 09:43:48 | 2020-12-01 10:04:38 | 
 | 2 | 0:06:37 | 2020-12-02 08:46:48 | 2020-12-02 08:53:25 | 
