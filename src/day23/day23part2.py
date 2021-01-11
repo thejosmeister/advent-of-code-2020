@@ -1,97 +1,85 @@
+"""
+Day 23 Part 2
+
+Using 'Vector memory' after looking for a hint as all my efforts fell short both by trying to spot a pattern and make
+the process more memory efficient.
+
+The vector_memory is a list where the entry at each index is the number of the cup to the right of the cup labelled
+the index. This list starts with 0 to deal with there being no cup labelled 0.
+"""
+
+inp = '942387615'
+list_size = 1000000
+
+# This list is used to create the first part of our vector memory.
+initial_list = [int(item) for item in list(inp)]
+initial_list.append(10)
+
+# Create the vector memory.
+vector_memory = [0]
+for i in range(1, list_size):
+    if i < 10:
+        vector_memory.append(initial_list[initial_list.index(i) + 1])
+    else:
+        vector_memory.append(i + 1)
+vector_memory.append(initial_list[0])
+
+# The current cup is at the start of our input.
+current_cup = initial_list[0]
 
 
-class CircularMemory:
-    def __init__(self, input_list: list):
-        self.mem = input_list
-
-    def item_at(self, point: int) -> int:
-        modulus = len(self.mem)
-        return self.mem[point % modulus]
-
-    def remove_x_items_from_after_y(self, x: int, y: int) -> list:
-        if x > len(self.mem):
-            print('Cannot remove ' + str(x) + ' from memory')
-        count = 0
-        out = []
-        index_of_y = self.mem.index(y)
-        while count < x:
-            if index_of_y + 1 >= len(self.mem):
-                out.append(self.mem.pop(0))
-            else:
-                out.append(self.mem.pop(index_of_y + 1))
-            count += 1
-        return out
-
-    def insert_list_after_x(self, list_to_insert: list, after_value: int):
-        index_of_value = self.mem.index(after_value)
-        if index_of_value == len(self.mem) - 1:
-            self.mem = self.mem + list_to_insert
-        else:
-            self.mem = self.mem[:index_of_value + 1] + list_to_insert + self.mem[index_of_value + 1:]
-
-    def increment_pointer(self, value: int) -> int:
-        return self.mem[(self.mem.index(value) + 1) % len(self.mem)]
+# This will find the next lowest cup left in the list after the current cup once we have removed the 3 cups.
+def find_place_for_3(current_num: int, the_three: list) -> int:
+    global list_size
+    if (((current_num - 1) - 1) % list_size) + 1 in the_three:
+        if (((current_num - 1) - 2) % list_size) + 1 in the_three:
+            if (((current_num - 1) - 3) % list_size) + 1 in the_three:
+                return (((current_num - 1) - 4) % list_size) + 1
+            return (((current_num - 1) - 3) % list_size) + 1
+        return (((current_num - 1) - 2) % list_size) + 1
+    return (((current_num - 1) - 1) % list_size) + 1
 
 
-class CupList:
-
-    def __init__(self, input_list: list):
-        self.cups = CircularMemory(input_list)
-        self.current_cup_value = self.cups.mem[0]
-        self.list_of_currents = [self.cups.mem[0]]
-
-    def output_from_cup_1(self) -> list:
-        return self.cups.mem[self.cups.mem.index(1) + 1: self.cups.mem.index(1) + 10]
-
-    def play_round(self):
-        mod = len(self.cups.mem)
-        the_3_cups = self.cups.remove_x_items_from_after_y(3, self.current_cup_value)
-
-        if (((self.current_cup_value - 1) - 1) % mod) + 1 in the_3_cups:
-            if (((self.current_cup_value - 1) - 2) % mod) + 1 in the_3_cups:
-                if (((self.current_cup_value - 1) - 3) % mod) + 1 in the_3_cups:
-                    self.cups.insert_list_after_x(the_3_cups, (((self.current_cup_value - 1) - 4) % mod) + 1)
-                else:
-                    self.cups.insert_list_after_x(the_3_cups, (((self.current_cup_value - 1) - 3) % mod) + 1)
-            else:
-                self.cups.insert_list_after_x(the_3_cups, (((self.current_cup_value - 1) - 2) % mod) + 1)
-        else:
-            self.cups.insert_list_after_x(the_3_cups, (((self.current_cup_value - 1) - 1) % mod) + 1)
-
-        self.current_cup_value = self.cups.increment_pointer(self.current_cup_value)
-        self.list_of_currents.append(self.current_cup_value)
-        # print(self.cups.mem)
-        # print(self.current_cup_value)
+# Get the cup next to the one specified.
+def get_next_cup(cup: int) -> int:
+    global vector_memory
+    return vector_memory[cup]
 
 
-inp = ['942387615']
-# inp = [ '978423615', '942387615']
-big_lists = [[int(item) for item in list(inpu)] for inpu in inp]
-list_size = 1000
+# Play a round of the game.
+def play_round():
+    global list_size
+    global vector_memory
+    global current_cup
 
-for big_list in big_lists:
-    for z in range(10, list_size + 1):
-        big_list.append(z)
+    # Get the 3 cups we are going to move.
+    three_cups_start = get_next_cup(current_cup)
+    three_cups_middle = get_next_cup(three_cups_start)
+    three_cups_end = get_next_cup(three_cups_middle)
 
-cup_lists = [CupList(big_list) for big_list in big_lists]
+    # Find where to move the three cups and prepare for changes to the list.
+    place_for_3 = find_place_for_3(current_cup, [three_cups_start, three_cups_middle, three_cups_end])
+    after_three = get_next_cup(place_for_3)
+    new_cup_after_current = get_next_cup(three_cups_end)
 
+    # Make the changes required to the cup list.
+    vector_memory[place_for_3] = three_cups_start
+    vector_memory[three_cups_end] = after_three
+    vector_memory[current_cup] = new_cup_after_current
+
+    # Move to the next current cup
+    current_cup = get_next_cup(current_cup)
+
+
+# We will play 10000000 rounds.
 for i in range(list_size * 10):
-    for cup_list in cup_lists:
-        cup_list.play_round()
+    if i % 100000 == 0:
+        print('Round ' + str(i))
+
+    play_round()
 
 
-[print(cup_list.output_from_cup_1()) for cup_list in cup_lists]
-# [print(cup_list.cups.mem) for cup_list in cup_lists]
-# [print(cup_list.list_of_currents) for cup_list in cup_lists]
+# Get the 2 numbers to the right of the 1 cup.
+nums_next_to_1 = [get_next_cup(1), get_next_cup(get_next_cup(1))]
 
-[print(x[list_size * 10 - x[::-1].index(1) + 1:list_size * 10 - x[::-1].index(1) + 10]) for x in [cup_list.list_of_currents for cup_list in cup_lists]]
-
-
-# Values after one for list size
-# 100 44,11
-# 1000 568,45
-# 10000 2750, 1762
-
-# 24/12/20
-# Looking at the values for the current cup it appears that the last time 1 is the current cup the next 2 current cups
-# are the values right of 1 at the end. This appears to only work for #rounds = 10*len(input).
+print('Numbers next to 1 multiplied together: ' + str(nums_next_to_1[0] * nums_next_to_1[1]))
