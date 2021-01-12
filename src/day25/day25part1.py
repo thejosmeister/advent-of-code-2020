@@ -18,19 +18,23 @@ for file_line in f:
     numbers.append(int(file_line.rstrip()))
 f.close()
 
-the_powers = []
+the_powers = [0, 0]
 
-for number in numbers:
-    i = 2
-    num = 7
-    while True:
-        calc = (num * subject_number) % base
-        if calc == number:
-            break
-        num = calc
-        i += 1
-    print(str(number) + ' is equal to ' + str(subject_number) + ' to the power of: ' + str(i))
-    the_powers.append(i)
+i = 2
+num = 7
+while True:
+    calc = (num * subject_number) % base
+    if calc == numbers[0]:
+        the_powers[0] = i
+        print(str(numbers[0]) + ' is equal to ' + str(subject_number) + ' to the power of: ' + str(i))
+    if calc == numbers[1]:
+        the_powers[1] = i
+        print(str(numbers[1]) + ' is equal to ' + str(subject_number) + ' to the power of: ' + str(i))
+
+    if the_powers[0] != 0 and the_powers[1] != 0:
+        break
+    num = calc
+    i += 1
 
 a_b = the_powers[0] * the_powers[1]
 print('The common secret key is: ' + str(pow(subject_number, a_b, base)))
