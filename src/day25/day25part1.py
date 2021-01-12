@@ -24,12 +24,11 @@ i = 2
 num = 7
 while True:
     calc = (num * subject_number) % base
-    if calc == numbers[0]:
-        the_powers[0] = i
-        print(str(numbers[0]) + ' is equal to ' + str(subject_number) + ' to the power of: ' + str(i))
-    if calc == numbers[1]:
-        the_powers[1] = i
-        print(str(numbers[1]) + ' is equal to ' + str(subject_number) + ' to the power of: ' + str(i))
+
+    for j in [0, 1]:
+        if calc == numbers[j] and the_powers[j] == 0:
+            the_powers[j] = i
+            print(str(numbers[j]) + ' is equal to ' + str(subject_number) + ' to the power of: ' + str(i))
 
     if the_powers[0] != 0 and the_powers[1] != 0:
         break
